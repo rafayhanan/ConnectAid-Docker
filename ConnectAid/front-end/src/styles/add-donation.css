@@ -1,0 +1,17 @@
+
+.submit-btn:hover {
+    background-color: #1d4ed8;
+    box-shadow: 0 4px 10px rgba(29, 78, 216, 0.3);
+  }
+  
+ 
+.input-field:focus {
+    border-color: #2563eb; 
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+  }
+  
+
+.input-field {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  
