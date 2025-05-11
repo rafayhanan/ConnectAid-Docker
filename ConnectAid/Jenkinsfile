@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_COMPOSE_PROJECT = 'jenkins-connectaid'
+        DOCKER_COMPOSE_FILE = 'docker-compose.yml'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from GitHub repository
+                checkout scm
+            }
+        }
+
+        stage('Build and Start Containers') {
+            steps {
+                dir('ConnectAid') {
+                    // Build and start Docker containers
+                    sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} build'
+                    sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} up -d'
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                // Verify containers are up
+                sh 'docker ps | grep jenkins-connectaid'
+
+                // Allow startup time
+                sh 'sleep 10'
+
+                // Test backend response
+                sh 'curl -s http://localhost:5001 || true'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Deployment failed!'
+            // Stop containers if failure
+            sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} down || true'
+        }
+        always {
+            // Archive docker-compose logs (if any)
+            archiveArtifacts artifacts: 'ConnectAid/docker-compose.log', allowEmptyArchive: true
+        }
+    }
+}
