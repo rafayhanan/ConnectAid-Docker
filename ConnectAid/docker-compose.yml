@@ -13,8 +13,8 @@ services:
       - uploads_data:/app/uploads
     environment:
       - PORT=5000
-      - MONGODB_URI=mongodb+srv://your_mongodb_atlas_uri
-      - JWT_SECRET=your_jwt_secret_key
+      - MONGODB_URI=mongodb+srv://mrafayhanan:WJzIxn3cDWHARG9W@cluster0.bqydw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - JWT_SECRET=29346026e705f010460a9513cbf6b5e26c8c12172e9a8ef471f739ed335570423062f3993a71c2ea0843fbac353dbfbfd4d9c5d57438d9576176ca972134c904cc2edce2d914f360eec7c5e50fdfbf8714c3aaf915d222777441bf5b3f105096c558720d04867d7d1b771328f529bd1beba881fd256943652ebbd290d5090ed355667dca8f49d1615ecacbc4091d41f44f782b352af37e93239837cd35c1e01292a8cf45ff39a6a89f9ce884866bbc7af3343cb1c8dac1cb196f1923310b61eb49b817eb41083a643cd29c08931ee7dacb4c5889ea43a56c170ec21c8e73e089805921ff92260b776635a1a9ea656b41650f521d4ec494044ba4a2246a3ddf42
     networks:
       - connectaid-network
 
