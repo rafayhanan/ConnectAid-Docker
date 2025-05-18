@@ -4,6 +4,8 @@ pipeline {
     environment {
         DOCKER_COMPOSE_PROJECT = 'cicd-connectaid'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
+        MONGODB_URI = credentials('MONGODB_URI')
+        JWT_SECRET = credentials('JWT_SECRET')
     }
 
     stages {
@@ -11,6 +13,22 @@ pipeline {
             steps {
                 // Checkout code from GitHub repository
                 checkout scm
+            }
+        }
+
+        stage('Setup Environment') {
+            steps {
+                dir('ConnectAid') {
+                    sh '''
+                        cat > back-end/.env << EOF
+NODE_ENV=production
+PORT=5000
+MONGODB_URI=${MONGODB_URI}
+JWT_SECRET=${JWT_SECRET}
+JWT_EXPIRATION=24h
+EOF
+                    '''
+                }
             }
         }
 
