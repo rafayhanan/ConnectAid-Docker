@@ -1,35 +1,35 @@
 version: '3.8'
 
 services:
-  jenkins-backend:
+  cicd-backend:
     build: ./back-end
-    container_name: jenkins-connectaid-backend
+    container_name: cicd-connectaid-backend
     restart: unless-stopped
     ports:
-      - "5001:5000"
+      - "5002:5000"
     volumes:
       - ./back-end:/app
       - uploads_data:/app/uploads
     env_file:
       - ./back-end/.env
     networks:
-      - jenkins-connectaid-network
+      - cicd-connectaid-network
 
-  jenkins-frontend:
+  cicd-frontend:
     build: ./front-end
-    container_name: jenkins-connectaid-frontend
+    container_name: cicd-connectaid-frontend
     restart: unless-stopped
     ports:
-      - "81:80"
+      - "82:80"
     depends_on:
-      - jenkins-backend
+      - cicd-backend
     volumes:
       - ./front-end:/app/code
     networks:
-      - jenkins-connectaid-network
+      - cicd-connectaid-network
 
 networks:
-  jenkins-connectaid-network:
+  cicd-connectaid-network:
     driver: bridge
 
 volumes:

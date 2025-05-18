@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_COMPOSE_PROJECT = 'jenkins-connectaid'
+        DOCKER_COMPOSE_PROJECT = 'cicd-connectaid'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
     }
 
@@ -27,13 +27,13 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 // Verify containers are up
-                sh 'docker ps | grep jenkins-connectaid'
+                sh 'docker ps | grep cicd-connectaid'
 
                 // Allow startup time
                 sh 'sleep 10'
 
                 // Test backend response
-                sh 'curl -s http://localhost:5001 || true'
+                sh 'curl -s http://localhost:5002 || true'
             }
         }
     }
