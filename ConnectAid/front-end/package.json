@@ -19,7 +19,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://jenkins-backend:5000",
+  "proxy": "http://cicd-backend:5000",
   "eslintConfig": {
     "extends": [
       "react-app",
