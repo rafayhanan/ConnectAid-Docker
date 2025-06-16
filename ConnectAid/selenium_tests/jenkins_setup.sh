@@ -97,4 +97,4 @@ for i in {1..10}; do
 done
 
 echo "🎉 Jenkins test environment setup complete!"
-echo "Ready to run: python3 -m pytest test_connectaid_suite.py --html=test_report.html --self-contained-html -v" 
+echo "Ready to run: python3 -m pytest test_connectaid_suite.py --html=test_report.html --self-contained-html -v"  
