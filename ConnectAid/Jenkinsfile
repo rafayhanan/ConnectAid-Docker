@@ -35,8 +35,11 @@ EOF
         stage('Build and Start Containers') {
             steps {
                 dir('ConnectAid') {
-                    // Build and start Docker containers
-                    sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} build'
+                    // Clean up any existing containers and images
+                    sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} down --rmi all --volumes --remove-orphans || true'
+                    
+                    // Build fresh images and start containers
+                    sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} build --no-cache'
                     sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} up -d'
                 }
             }
