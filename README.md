@@ -2,4 +2,4 @@
 
 Donation Platform made in MERN Stack!
 
-Testing Pipeline added.
+Jenkins Testing Pipeline added.
