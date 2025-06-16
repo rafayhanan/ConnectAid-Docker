@@ -16,9 +16,9 @@ command_exists() {
 echo "📦 Updating system packages..."
 sudo apt-get update -qq || true
 
-# 2. Install Python3 and pip
-echo "🐍 Installing Python3 and pip..."
-sudo apt-get install -y python3 python3-pip python3-venv || true
+# 2. Install Python3, pip, and unzip
+echo "🐍 Installing Python3, pip, and system tools..."
+sudo apt-get install -y python3 python3-pip python3-venv unzip || true
 
 # 3. Install Google Chrome
 echo "🌐 Installing Google Chrome..."
@@ -61,7 +61,10 @@ sudo apt-get install -y xvfb || true
 
 # 6. Install Python dependencies
 echo "📋 Installing Python test dependencies..."
-pip3 install --user -r requirements.txt || true
+pip3 install --user -r requirements.txt --break-system-packages || {
+    echo "Installing individual packages with system override..."
+    pip3 install --user selenium pytest pytest-html webdriver-manager --break-system-packages || true
+}
 
 # 7. Set up virtual display
 echo "🖥️  Starting virtual display..."
