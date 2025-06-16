@@ -395,4 +395,4 @@ class TestConnectAidSuite(BaseTest):
         self.take_screenshot("10_logout_functionality.png")
         
         # Ensure we end with a working state
-        assert "localhost:3000" in self.driver.current_url, "Should be on working frontend" 
+        assert "localhost:82" in self.driver.current_url, "Should be on working frontend" 
