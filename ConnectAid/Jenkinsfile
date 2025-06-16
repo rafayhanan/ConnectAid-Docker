@@ -52,22 +52,79 @@ EOF
 
                 // Test backend response
                 sh 'curl -s http://localhost:5002 || true'
+                
+                // Test frontend response
+                sh 'curl -s http://localhost:82 || true'
+            }
+        }
+
+        stage('Setup Test Environment') {
+            steps {
+                dir('ConnectAid/selenium_tests') {
+                    // Make setup script executable and run it
+                    sh 'chmod +x jenkins_setup.sh'
+                    sh './jenkins_setup.sh'
+                }
+            }
+        }
+
+        stage('Run Selenium Tests') {
+            steps {
+                dir('ConnectAid/selenium_tests') {
+                    script {
+                        try {
+                            // Run the test suite with proper environment
+                            sh '''
+                                export DISPLAY=:99
+                                python3 -m pytest test_connectaid_suite.py \
+                                    --html=test_report.html \
+                                    --self-contained-html \
+                                    -v \
+                                    --tb=short \
+                                    --maxfail=5
+                            '''
+                            echo "✅ All tests passed successfully!"
+                        } catch (Exception e) {
+                            // Mark build as unstable if tests fail but allow pipeline to continue
+                            currentBuild.result = 'UNSTABLE'
+                            echo "⚠️ Some tests failed: ${e.getMessage()}"
+                        }
+                    }
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'Deployment successful!'
+            echo 'Deployment and Testing successful!'
         }
         failure {
-            echo 'Deployment failed!'
+            echo 'Pipeline failed!'
             // Stop containers if failure
             sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} down || true'
         }
+        unstable {
+            echo 'Deployment successful but tests failed!'
+        }
         always {
+            // Archive test reports
+            archiveArtifacts artifacts: 'ConnectAid/selenium_tests/test_report.html', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'ConnectAid/selenium_tests/reports/*', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'ConnectAid/selenium_tests/screenshots/*', allowEmptyArchive: true
+            
             // Archive docker-compose logs (if any)
             archiveArtifacts artifacts: 'ConnectAid/docker-compose.log', allowEmptyArchive: true
+            
+            // Publish HTML test reports
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'ConnectAid/selenium_tests',
+                reportFiles: 'test_report.html',
+                reportName: 'Selenium Test Report'
+            ])
         }
     }
 }
