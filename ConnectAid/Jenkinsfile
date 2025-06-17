@@ -35,12 +35,29 @@ EOF
         stage('Build and Start Containers') {
             steps {
                 dir('ConnectAid') {
-                    // Clean up any existing containers and images
-                    sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} down --rmi all --volumes --remove-orphans || true'
-                    
-                    // Build fresh images and start containers
-                    sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} build --no-cache'
-                    sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} up -d'
+                    script {
+                        // Check if containers are already running
+                        def containersRunning = sh(
+                            script: 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} ps -q | wc -l',
+                            returnStdout: true
+                        ).trim()
+                        
+                        if (containersRunning != '0') {
+                            echo "Containers are running. Stopping gracefully..."
+                            sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} down'
+                        }
+                        
+                        // Build with cache (much faster for incremental changes)
+                        echo "Building containers with cache optimization..."
+                        sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} build'
+                        
+                        // Start containers
+                        echo "Starting containers..."
+                        sh 'docker-compose -p ${DOCKER_COMPOSE_PROJECT} -f ${DOCKER_COMPOSE_FILE} up -d'
+                        
+                        // Clean up dangling images to save space (optional)
+                        sh 'docker image prune -f || true'
+                    }
                 }
             }
         }
